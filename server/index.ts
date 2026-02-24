@@ -1,6 +1,7 @@
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
+import { seedAdmin } from "./seed";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -177,6 +178,13 @@ function configureExpoAndLanding(app: express.Application) {
       return next();
     }
 
+    if (req.path === "/admin") {
+      const adminPath = path.resolve(process.cwd(), "server", "templates", "admin.html");
+      const adminHtml = fs.readFileSync(adminPath, "utf-8");
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      return res.status(200).send(adminHtml);
+    }
+
     if (req.path !== "/" && req.path !== "/manifest") {
       return next();
     }
@@ -233,6 +241,8 @@ function setupErrorHandler(app: express.Application) {
   configureExpoAndLanding(app);
 
   const server = await registerRoutes(app);
+
+  await seedAdmin();
 
   setupErrorHandler(app);
 
