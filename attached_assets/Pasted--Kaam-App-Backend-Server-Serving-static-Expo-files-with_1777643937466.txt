@@ -1,0 +1,53 @@
+ Kaam App - Backend Server
+========================================
+Serving static Expo files with dynamic manifest routing
+Expo routing: Checking expo-platform header on / and /manifest
+(node:10984) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Admin user seeded: username=admin, password=admin123
+express server serving on port 5000
+baseUrl http://localhost:5000
+expsUrl localhost:5000
+GET /api/auth/me 401 in 3ms :: {"message":"Not authenticated"}
+POST /api/auth/login 200 in 9475ms :: {"id":"bece99bb-ca26-4210-9557-5357b5fdd2…
+GET /api/admin/stats 401 in 3ms :: {"message":"Not authenticated"}
+GET /api/news 200 in 349ms :: []
+POST /api/auth/login 200 in 864ms :: {"id":"bece99bb-ca26-4210-9557-5357b5fdd27…
+GET /api/jobs 200 in 346ms :: []
+GET /api/admin/users 401 in 3ms :: {"message":"Not authenticated"}
+GET /api/admin/stats 401 in 2ms :: {"message":"Not authenticated"}
+GET /api/rooms 200 in 382ms :: []
+GET /api/events 200 in 360ms :: []
+GET /api/admin/users 401 in 2ms :: {"message":"Not authenticated"}
+GET /api/news 304 in 349ms :: []
+GET /api/jobs 304 in 371ms :: []
+GET /api/rooms 304 in 346ms :: []
+GET /api/events 304 in 341ms :: []
+POST /api/auth/login 200 in 8649ms :: {"id":"bece99bb-ca26-4210-9557-5357b5fdd2…
+GET /api/admin/stats 401 in 1ms :: {"message":"Not authenticated"}
+GET /api/admin/users 401 in 5ms :: {"message":"Not authenticated"}
+POST /api/auth/login 200 in 10808ms :: {"id":"bece99bb-ca26-4210-9557-5357b5fdd…
+GET /api/admin/stats 401 in 4ms :: {"message":"Not authenticated"}
+GET /api/admin/users 401 in 1ms :: {"message":"Not authenticated"}
+GET /api/news 304 in 343ms :: []
+GET /api/jobs 304 in 366ms :: []
+GET /api/rooms 304 in 374ms :: []
+GET /api/news 304 in 342ms :: []
+GET /api/embassy 200 in 3668ms :: []
+GET /api/jobs 304 in 369ms :: []
+GET /api/rooms 304 in 382ms :: []
+GET /api/embassy 304 in 343ms :: []
+GET /api/embassy 304 in 336ms :: []
+GET /api/embassy 304 in 338ms :: []
+GET /api/events 304 in 3806ms :: []
+GET /api/events 304 in 347ms :: []
+POST /api/news 401 in 2ms :: {"message":"Not authenticated"}
+POST /api/news 401 in 2ms :: {"message":"Not authenticated"}
+POST /api/news 401 in 3ms :: {"message":"Not authenticated"}
