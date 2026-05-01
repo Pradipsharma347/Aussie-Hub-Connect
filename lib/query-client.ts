@@ -12,7 +12,13 @@ export function getApiUrl(): string {
     throw new Error("EXPO_PUBLIC_DOMAIN is not set");
   }
 
-  let url = new URL(`https://${host}`);
+  const isLocal =
+    host.startsWith("localhost") ||
+    host.startsWith("127.0.0.1") ||
+    host.startsWith("192.168.");
+
+  const protocol = isLocal ? "http" : "https";
+  let url = new URL(`${protocol}://${host}`);
 
   return url.href;
 }
