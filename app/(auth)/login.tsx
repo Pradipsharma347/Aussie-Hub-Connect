@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -32,7 +33,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await login(username.trim(), password);
-      router.dismissAll();
+      router.replace("/(tabs)");
     } catch (err: any) {
       setError(err.message || "Login failed");
     } finally {
@@ -51,9 +52,11 @@ export default function LoginScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <View style={styles.iconCircle}>
-            <Ionicons name="briefcase" size={32} color={Colors.white} />
-          </View>
+          <Image
+            source={require("@/assets/images/logo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Sign in to your Kaam App account</Text>
         </View>
@@ -78,6 +81,7 @@ export default function LoginScreen() {
                 placeholderTextColor={Colors.textLight}
                 autoCapitalize="none"
                 autoCorrect={false}
+                testID="username-input"
               />
             </View>
           </View>
@@ -93,6 +97,7 @@ export default function LoginScreen() {
                 placeholder="Enter your password"
                 placeholderTextColor={Colors.textLight}
                 secureTextEntry={!showPassword}
+                testID="password-input"
               />
               <Pressable onPress={() => setShowPassword(!showPassword)}>
                 <Ionicons
@@ -108,6 +113,7 @@ export default function LoginScreen() {
             style={({ pressed }) => [styles.loginBtn, pressed && { opacity: 0.9 }]}
             onPress={handleLogin}
             disabled={loading}
+            testID="login-button"
           >
             {loading ? (
               <ActivityIndicator color={Colors.white} />
@@ -142,14 +148,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 32,
   },
-  iconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: Colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
+  logo: {
+    width: 100,
+    height: 100,
     marginBottom: 16,
+    borderRadius: 20,
   },
   title: {
     fontSize: 28,

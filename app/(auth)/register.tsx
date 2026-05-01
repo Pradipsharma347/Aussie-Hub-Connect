@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -43,7 +44,7 @@ export default function RegisterScreen() {
         email: email.trim(),
         password,
       });
-      router.dismissAll();
+      router.replace("/(tabs)");
     } catch (err: any) {
       setError(err.message || "Registration failed");
     } finally {
@@ -62,9 +63,11 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <View style={styles.iconCircle}>
-            <Ionicons name="person-add" size={28} color={Colors.white} />
-          </View>
+          <Image
+            source={require("@/assets/images/logo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Join Kaam App to find jobs, rooms & more</Text>
         </View>
@@ -183,14 +186,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 28,
   },
-  iconCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: Colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
+  logo: {
+    width: 100,
+    height: 100,
     marginBottom: 16,
+    borderRadius: 20,
   },
   title: {
     fontSize: 28,

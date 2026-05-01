@@ -4,6 +4,9 @@
 Multi-platform community app for the Australian market. Features Jobs listings, Room listings, News portal, Events, Australian Embassy details, and user profiles with authentication. Admin dashboard for managing all content.
 
 ## Recent Changes
+- 2026-05-01: Mandatory auth gate implemented — unauthenticated users are always redirected to login screen
+- 2026-05-01: Uploaded logo (icon_1777637651878.png) now used as app icon, splash, favicon, and shown in login/register screens
+- 2026-05-01: Auth redirects cleaned up — login/register use router.replace("/(tabs)") after success
 - 2026-02-24: Complete rebuild of all mobile app screens with proper styling, navigation, and data fetching
 - 2026-02-24: Generated branded app icons (green/gold briefcase theme)
 - 2026-02-24: Initial project setup with database, backend APIs, admin dashboard, and mobile app
