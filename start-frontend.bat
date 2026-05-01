@@ -1,0 +1,3 @@
+@echo off
+echo Starting Kaam App Frontend...
+npx expo start
