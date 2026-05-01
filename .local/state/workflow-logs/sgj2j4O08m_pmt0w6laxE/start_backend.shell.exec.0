@@ -1,0 +1,16 @@
+[1G[0K⠙[1G[0K
+> expo-app@1.0.0 server:dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0K⠙[1G[0KServing static Expo files with dynamic manifest routing
+Expo routing: Checking expo-platform header on / and /manifest
+express server serving on port 5000
+GET /api/auth/me 401 in 31ms :: {"message":"Not authenticated"}
+GET /api/jobs 304 in 109ms :: []
+GET /api/news 304 in 76ms :: []
+GET /api/events 304 in 79ms :: []
+GET /api/news 200 in 15ms :: []
+GET /api/events 200 in 9ms :: []
+GET /api/auth/me 401 in 1ms :: {"message":"Not authenticated"}
+GET /api/jobs 200 in 2ms :: []
+GET /api/rooms 200 in 5ms :: []
