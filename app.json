@@ -2,7 +2,7 @@
   "expo": {
     "name": "Kaam App",
     "slug": "kaam-app",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "kaamapp",
@@ -19,6 +19,7 @@
     },
     "android": {
       "package": "com.kaamapp",
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#1B4D3E",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
