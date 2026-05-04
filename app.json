@@ -18,8 +18,7 @@
       "bundleIdentifier": "com.kaamapp"
     },
     "android": {
-      "package": "com.kaamapp",
-      "versionCode": 2,
+      "package": "com.kaamjobs.app",
       "adaptiveIcon": {
         "backgroundColor": "#1B4D3E",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
