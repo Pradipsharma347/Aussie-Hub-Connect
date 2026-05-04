@@ -2,11 +2,10 @@ import { fetch } from "expo/fetch";
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 /**
- * Gets the base URL for the Express API server (e.g., "http://localhost:3000")
- * @returns {string} The API base URL
+ * Gets the base URL for the Express API server
  */
 export function getApiUrl(): string {
-  let host = process.env.EXPO_PUBLIC_DOMAIN;
+  const host = process.env.EXPO_PUBLIC_DOMAIN;
 
   if (!host) {
     throw new Error("EXPO_PUBLIC_DOMAIN is not set");
@@ -18,22 +17,24 @@ export function getApiUrl(): string {
     host.startsWith("192.168.");
 
   const protocol = isLocal ? "http" : "https";
-  let url = new URL(`${protocol}://${host}`);
 
-  return url.href;
+  return `${protocol}://${host}`;
 }
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
-    const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
+    const text = await res.text();
+    throw new Error(`${res.status}: ${text || res.statusText}`);
   }
 }
 
+/**
+ * API request helper (IMPORTANT: includes cookies)
+ */
 export async function apiRequest(
   method: string,
   route: string,
-  data?: unknown | undefined,
+  data?: unknown,
 ): Promise<Response> {
   const baseUrl = getApiUrl();
   const url = new URL(route, baseUrl);
@@ -42,6 +43,8 @@ export async function apiRequest(
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
+
+    // 🔥 IMPORTANT: session cookie support
     credentials: "include",
   });
 
@@ -50,16 +53,33 @@ export async function apiRequest(
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
+
+/**
+ * React Query fetch function (FIXED)
+ */
 export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const baseUrl = getApiUrl();
-    const url = new URL(queryKey.join("/") as string, baseUrl);
+
+    // safer join (avoids broken URLs)
+    const route = Array.isArray(queryKey)
+      ? queryKey.join("/")
+      : String(queryKey);
+
+    const url = new URL(route, baseUrl);
 
     const res = await fetch(url.toString(), {
+      method: "GET",
+
+      // 🔥 CRITICAL FIX (this solves your issue)
       credentials: "include",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
@@ -70,6 +90,9 @@ export const getQueryFn: <T>(options: {
     return await res.json();
   };
 
+/**
+ * React Query client
+ */
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

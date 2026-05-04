@@ -4,9 +4,13 @@ import session from "express-session";
 import bcrypt from "bcryptjs";
 import connectPg from "connect-pg-simple";
 import {
-  insertUserSchema, loginSchema,
-  insertNewsSchema, insertEventSchema, insertJobSchema,
-  insertRoomSchema, insertEmbassySchema,
+  insertUserSchema,
+  loginSchema,
+  insertNewsSchema,
+  insertEventSchema,
+  insertJobSchema,
+  insertRoomSchema,
+  insertEmbassySchema,
 } from "@shared/schema";
 import * as storage from "./storage";
 
@@ -49,10 +53,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       cookie: {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        secure: true,
       },
-    })
+    }),
   );
 
   app.post("/api/auth/register", async (req: Request, res: Response) => {
@@ -63,7 +67,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username already taken" });
       }
       const hashedPassword = await bcrypt.hash(data.password, 10);
-      const user = await storage.createUser({ ...data, password: hashedPassword });
+      const user = await storage.createUser({
+        ...data,
+        password: hashedPassword,
+      });
       req.session.userId = user.id;
       const { password, ...safeUser } = user;
       res.json(safeUser);
@@ -113,17 +120,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(safeUser);
   });
 
-  app.put("/api/auth/profile", requireAuth, async (req: Request, res: Response) => {
-    try {
-      const { fullName, phone, city, bio, email } = req.body;
-      const user = await storage.updateUser(req.session.userId!, { fullName, phone, city, bio, email });
-      if (!user) return res.status(404).json({ message: "User not found" });
-      const { password, ...safeUser } = user;
-      res.json(safeUser);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message || "Update failed" });
-    }
-  });
+  app.put(
+    "/api/auth/profile",
+    requireAuth,
+    async (req: Request, res: Response) => {
+      try {
+        const { fullName, phone, city, bio, email } = req.body;
+        const user = await storage.updateUser(req.session.userId!, {
+          fullName,
+          phone,
+          city,
+          bio,
+          email,
+        });
+        if (!user) return res.status(404).json({ message: "User not found" });
+        const { password, ...safeUser } = user;
+        res.json(safeUser);
+      } catch (error: any) {
+        res.status(400).json({ message: error.message || "Update failed" });
+      }
+    },
+  );
 
   // NEWS
   app.get("/api/news", async (_req: Request, res: Response) => {
@@ -147,16 +164,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/news/:id", requireAdmin, async (req: Request, res: Response) => {
-    const item = await storage.updateNews(req.params.id, req.body);
-    if (!item) return res.status(404).json({ message: "Not found" });
-    res.json(item);
-  });
+  app.put(
+    "/api/news/:id",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      const item = await storage.updateNews(req.params.id, req.body);
+      if (!item) return res.status(404).json({ message: "Not found" });
+      res.json(item);
+    },
+  );
 
-  app.delete("/api/news/:id", requireAdmin, async (req: Request, res: Response) => {
-    await storage.deleteNews(req.params.id);
-    res.json({ message: "Deleted" });
-  });
+  app.delete(
+    "/api/news/:id",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      await storage.deleteNews(req.params.id);
+      res.json({ message: "Deleted" });
+    },
+  );
 
   // EVENTS
   app.get("/api/events", async (_req: Request, res: Response) => {
@@ -180,16 +205,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/events/:id", requireAdmin, async (req: Request, res: Response) => {
-    const item = await storage.updateEvent(req.params.id, req.body);
-    if (!item) return res.status(404).json({ message: "Not found" });
-    res.json(item);
-  });
+  app.put(
+    "/api/events/:id",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      const item = await storage.updateEvent(req.params.id, req.body);
+      if (!item) return res.status(404).json({ message: "Not found" });
+      res.json(item);
+    },
+  );
 
-  app.delete("/api/events/:id", requireAdmin, async (req: Request, res: Response) => {
-    await storage.deleteEvent(req.params.id);
-    res.json({ message: "Deleted" });
-  });
+  app.delete(
+    "/api/events/:id",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      await storage.deleteEvent(req.params.id);
+      res.json({ message: "Deleted" });
+    },
+  );
 
   // JOBS
   app.get("/api/jobs", async (_req: Request, res: Response) => {
@@ -213,16 +246,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/jobs/:id", requireAdmin, async (req: Request, res: Response) => {
-    const item = await storage.updateJob(req.params.id, req.body);
-    if (!item) return res.status(404).json({ message: "Not found" });
-    res.json(item);
-  });
+  app.put(
+    "/api/jobs/:id",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      const item = await storage.updateJob(req.params.id, req.body);
+      if (!item) return res.status(404).json({ message: "Not found" });
+      res.json(item);
+    },
+  );
 
-  app.delete("/api/jobs/:id", requireAdmin, async (req: Request, res: Response) => {
-    await storage.deleteJob(req.params.id);
-    res.json({ message: "Deleted" });
-  });
+  app.delete(
+    "/api/jobs/:id",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      await storage.deleteJob(req.params.id);
+      res.json({ message: "Deleted" });
+    },
+  );
 
   // ROOMS
   app.get("/api/rooms", async (_req: Request, res: Response) => {
@@ -246,16 +287,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/rooms/:id", requireAdmin, async (req: Request, res: Response) => {
-    const item = await storage.updateRoom(req.params.id, req.body);
-    if (!item) return res.status(404).json({ message: "Not found" });
-    res.json(item);
-  });
+  app.put(
+    "/api/rooms/:id",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      const item = await storage.updateRoom(req.params.id, req.body);
+      if (!item) return res.status(404).json({ message: "Not found" });
+      res.json(item);
+    },
+  );
 
-  app.delete("/api/rooms/:id", requireAdmin, async (req: Request, res: Response) => {
-    await storage.deleteRoom(req.params.id);
-    res.json({ message: "Deleted" });
-  });
+  app.delete(
+    "/api/rooms/:id",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      await storage.deleteRoom(req.params.id);
+      res.json({ message: "Deleted" });
+    },
+  );
 
   // EMBASSY
   app.get("/api/embassy", async (_req: Request, res: Response) => {
@@ -269,89 +318,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(item);
   });
 
-  app.post("/api/embassy", requireAdmin, async (req: Request, res: Response) => {
-    try {
-      const data = insertEmbassySchema.parse(req.body);
-      const item = await storage.createEmbassy(data);
+  app.post(
+    "/api/embassy",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      try {
+        const data = insertEmbassySchema.parse(req.body);
+        const item = await storage.createEmbassy(data);
+        res.json(item);
+      } catch (error: any) {
+        res.status(400).json({ message: error.message });
+      }
+    },
+  );
+
+  app.put(
+    "/api/embassy/:id",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      const item = await storage.updateEmbassy(req.params.id, req.body);
+      if (!item) return res.status(404).json({ message: "Not found" });
       res.json(item);
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  });
+    },
+  );
 
-  app.put("/api/embassy/:id", requireAdmin, async (req: Request, res: Response) => {
-    const item = await storage.updateEmbassy(req.params.id, req.body);
-    if (!item) return res.status(404).json({ message: "Not found" });
-    res.json(item);
-  });
-
-  app.delete("/api/embassy/:id", requireAdmin, async (req: Request, res: Response) => {
-    await storage.deleteEmbassy(req.params.id);
-    res.json({ message: "Deleted" });
-  });
+  app.delete(
+    "/api/embassy/:id",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      await storage.deleteEmbassy(req.params.id);
+      res.json({ message: "Deleted" });
+    },
+  );
 
   // BOOKMARKS
-  app.get("/api/bookmarks", requireAuth, async (req: Request, res: Response) => {
-    const items = await storage.getUserBookmarks(req.session.userId!);
-    res.json(items);
-  });
+  app.get(
+    "/api/bookmarks",
+    requireAuth,
+    async (req: Request, res: Response) => {
+      const items = await storage.getUserBookmarks(req.session.userId!);
+      res.json(items);
+    },
+  );
 
-  app.post("/api/bookmarks", requireAuth, async (req: Request, res: Response) => {
-    const { itemType, itemId } = req.body;
-    const item = await storage.addBookmark(req.session.userId!, itemType, itemId);
-    res.json(item);
-  });
+  app.post(
+    "/api/bookmarks",
+    requireAuth,
+    async (req: Request, res: Response) => {
+      const { itemType, itemId } = req.body;
+      const item = await storage.addBookmark(
+        req.session.userId!,
+        itemType,
+        itemId,
+      );
+      res.json(item);
+    },
+  );
 
-  app.delete("/api/bookmarks", requireAuth, async (req: Request, res: Response) => {
-    const { itemType, itemId } = req.body;
-    await storage.removeBookmark(req.session.userId!, itemType, itemId);
-    res.json({ message: "Removed" });
-  });
+  app.delete(
+    "/api/bookmarks",
+    requireAuth,
+    async (req: Request, res: Response) => {
+      const { itemType, itemId } = req.body;
+      await storage.removeBookmark(req.session.userId!, itemType, itemId);
+      res.json({ message: "Removed" });
+    },
+  );
 
   // ADMIN - users
-  app.get("/api/admin/users", requireAdmin, async (_req: Request, res: Response) => {
-    const allUsers = await storage.getAllUsers();
-    const safeUsers = allUsers.map(({ password, ...u }) => u);
-    res.json(safeUsers);
-  });
+  app.get(
+    "/api/admin/users",
+    requireAdmin,
+    async (_req: Request, res: Response) => {
+      const allUsers = await storage.getAllUsers();
+      const safeUsers = allUsers.map(({ password, ...u }) => u);
+      res.json(safeUsers);
+    },
+  );
 
-  app.put("/api/admin/users/:id/block", requireAdmin, async (req: Request, res: Response) => {
-    const user = await storage.updateUser(req.params.id, { isBlocked: true });
-    if (!user) return res.status(404).json({ message: "User not found" });
-    const { password, ...safeUser } = user;
-    res.json(safeUser);
-  });
+  app.put(
+    "/api/admin/users/:id/block",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      const user = await storage.updateUser(req.params.id, { isBlocked: true });
+      if (!user) return res.status(404).json({ message: "User not found" });
+      const { password, ...safeUser } = user;
+      res.json(safeUser);
+    },
+  );
 
-  app.put("/api/admin/users/:id/unblock", requireAdmin, async (req: Request, res: Response) => {
-    const user = await storage.updateUser(req.params.id, { isBlocked: false });
-    if (!user) return res.status(404).json({ message: "User not found" });
-    const { password, ...safeUser } = user;
-    res.json(safeUser);
-  });
+  app.put(
+    "/api/admin/users/:id/unblock",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      const user = await storage.updateUser(req.params.id, {
+        isBlocked: false,
+      });
+      if (!user) return res.status(404).json({ message: "User not found" });
+      const { password, ...safeUser } = user;
+      res.json(safeUser);
+    },
+  );
 
-  app.put("/api/admin/users/:id/role", requireAdmin, async (req: Request, res: Response) => {
-    const { role } = req.body;
-    const user = await storage.updateUser(req.params.id, { role });
-    if (!user) return res.status(404).json({ message: "User not found" });
-    const { password, ...safeUser } = user;
-    res.json(safeUser);
-  });
+  app.put(
+    "/api/admin/users/:id/role",
+    requireAdmin,
+    async (req: Request, res: Response) => {
+      const { role } = req.body;
+      const user = await storage.updateUser(req.params.id, { role });
+      if (!user) return res.status(404).json({ message: "User not found" });
+      const { password, ...safeUser } = user;
+      res.json(safeUser);
+    },
+  );
 
   // ADMIN DASHBOARD STATS
-  app.get("/api/admin/stats", requireAdmin, async (_req: Request, res: Response) => {
-    const allUsers = await storage.getAllUsers();
-    const allNews = await storage.getAllNews();
-    const allEvents = await storage.getAllEvents();
-    const allJobs = await storage.getAllJobs();
-    const allRooms = await storage.getAllRooms();
-    res.json({
-      totalUsers: allUsers.length,
-      totalNews: allNews.length,
-      totalEvents: allEvents.length,
-      totalJobs: allJobs.length,
-      totalRooms: allRooms.length,
-    });
-  });
+  app.get(
+    "/api/admin/stats",
+    requireAdmin,
+    async (_req: Request, res: Response) => {
+      const allUsers = await storage.getAllUsers();
+      const allNews = await storage.getAllNews();
+      const allEvents = await storage.getAllEvents();
+      const allJobs = await storage.getAllJobs();
+      const allRooms = await storage.getAllRooms();
+      res.json({
+        totalUsers: allUsers.length,
+        totalNews: allNews.length,
+        totalEvents: allEvents.length,
+        totalJobs: allJobs.length,
+        totalRooms: allRooms.length,
+      });
+    },
+  );
 
   const httpServer = createServer(app);
   return httpServer;
