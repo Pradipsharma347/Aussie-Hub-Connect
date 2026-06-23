@@ -2,7 +2,8 @@ import { fetch } from "expo/fetch";
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 /**
- * Gets the base URL for the Express API server
+ * Gets the base URL for the API server
+ * Example: https://aussie-hub-connect.onrender.com
  */
 export function getApiUrl(): string {
   const host = process.env.EXPO_PUBLIC_DOMAIN;
@@ -11,16 +12,12 @@ export function getApiUrl(): string {
     throw new Error("EXPO_PUBLIC_DOMAIN is not set");
   }
 
-  const isLocal =
-    host.startsWith("localhost") ||
-    host.startsWith("127.0.0.1") ||
-    host.startsWith("192.168.");
-
-  const protocol = isLocal ? "http" : "https";
-
-  return `${protocol}://${host}`;
+  return host;
 }
 
+/**
+ * Throw error if response is not OK
+ */
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = await res.text();
@@ -29,7 +26,7 @@ async function throwIfResNotOk(res: Response) {
 }
 
 /**
- * API request helper (IMPORTANT: includes cookies)
+ * API request helper (POST, PUT, DELETE)
  */
 export async function apiRequest(
   method: string,
@@ -37,14 +34,13 @@ export async function apiRequest(
   data?: unknown,
 ): Promise<Response> {
   const baseUrl = getApiUrl();
+
   const url = new URL(route, baseUrl);
 
   const res = await fetch(url.toString(), {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},
     body: data ? JSON.stringify(data) : undefined,
-
-    // 🔥 IMPORTANT: session cookie support
     credentials: "include",
   });
 
@@ -55,7 +51,7 @@ export async function apiRequest(
 type UnauthorizedBehavior = "returnNull" | "throw";
 
 /**
- * React Query fetch function (FIXED)
+ * React Query GET function
  */
 export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
@@ -64,7 +60,6 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     const baseUrl = getApiUrl();
 
-    // safer join (avoids broken URLs)
     const route = Array.isArray(queryKey)
       ? queryKey.join("/")
       : String(queryKey);
@@ -73,10 +68,7 @@ export const getQueryFn: <T>(options: {
 
     const res = await fetch(url.toString(), {
       method: "GET",
-
-      // 🔥 CRITICAL FIX (this solves your issue)
       credentials: "include",
-
       headers: {
         "Content-Type": "application/json",
       },
@@ -91,14 +83,14 @@ export const getQueryFn: <T>(options: {
   };
 
 /**
- * React Query client
+ * React Query client setup
  */
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
-      refetchInterval: false,
       refetchOnWindowFocus: false,
+      refetchInterval: false,
       staleTime: Infinity,
       retry: false,
     },
